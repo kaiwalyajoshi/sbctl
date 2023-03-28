@@ -281,6 +281,16 @@ func (h handler) getAPIV1ClusterResources(w http.ResponseWriter, r *http.Request
 		//	w.WriteHeader(http.StatusInternalServerError)
 		//	return
 		//}
+	case "resourcequotas":
+		result = k8s.GetEmptyResourceQuotaList()
+		// TODO@kjoshi: Add this properly
+		//dirName := filepath.Join(h.clusterData.ClusterResourcesDir, fmt.Sprintf("%s", sbctlutil.GetSBCompatibleResourceName(resource)))
+		//filenames, err = getJSONFileListFromDir(dirName)
+		//if err != nil {
+		//	log.Println("failed to get resourcequota files from dir", err)
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
 	}
 
 	for _, fileName := range filenames {
@@ -1234,6 +1244,14 @@ func filterObjectsByLabels(object runtime.Object, selector fields.Selector) (run
 		return r, nil
 	case *corev1.ConfigMapList:
 		r := k8s.GetEmptyConfigMapList()
+		for _, i := range o.Items {
+			if selector.Matches(labels.Set(i.GetObjectMeta().GetLabels())) {
+				r.Items = append(r.Items, i)
+			}
+		}
+		return r, nil
+	case *corev1.ResourceQuotaList:
+		r := k8s.GetEmptyResourceQuotaList()
 		for _, i := range o.Items {
 			if selector.Matches(labels.Set(i.GetObjectMeta().GetLabels())) {
 				r.Items = append(r.Items, i)

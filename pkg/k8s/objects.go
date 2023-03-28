@@ -82,3 +82,14 @@ func GetEmptyConfigMapList() *corev1.ConfigMapList {
 	return r
 
 }
+
+func GetEmptyResourceQuotaList() *corev1.ResourceQuotaList {
+	r := &corev1.ResourceQuotaList{
+		Items: []corev1.ResourceQuota{},
+	}
+	r.GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
+		Version: "v1",
+		Kind:    "ResourceQuotaList",
+	})
+	return r
+}
