@@ -862,12 +862,13 @@ func (h handler) getAPIsClusterResources(w http.ResponseWriter, r *http.Request)
 			Version: version,
 			Kind:    "ClusterRoleBindingList",
 		})
-		filenames = []string{filepath.Join(h.clusterData.ClusterResourcesDir, fmt.Sprintf("%s.json", sbctlutil.GetSBCompatibleResourceName(resource)))}
-		if err != nil {
-			log.Println("failed to get cluster-role-binding files from dir", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		//TODO@kjoshi: Add this to the exporters.
+		//filenames = []string{filepath.Join(h.clusterData.ClusterResourcesDir, fmt.Sprintf("%s.json", sbctlutil.GetSBCompatibleResourceName(resource)))}
+		//if err != nil {
+		//	log.Println("failed to get cluster-role-binding files from dir", err)
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
 	}
 
 	for _, fileName := range filenames {
