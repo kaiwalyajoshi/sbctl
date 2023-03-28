@@ -779,6 +779,23 @@ func (h handler) getAPIsClusterResources(w http.ResponseWriter, r *http.Request)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+	case "networkpolicies":
+		result = &networkingv1.NetworkPolicyList{
+			Items: []networkingv1.NetworkPolicy{},
+		}
+		result.GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
+			Group:   group,
+			Version: version,
+			Kind:    "NetworkPolicyList",
+		})
+		//TODO@kjoshi: Implement this properly
+		//dirName := filepath.Join(h.clusterData.ClusterResourcesDir, sbctlutil.GetSBCompatibleResourceName(resource))
+		//filenames, err = getJSONFileListFromDir(dirName)
+		//if err != nil {
+		//	log.Println("failed to get networkpolicies files from dir", err)
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
 	case "roles":
 		result = &rbacv1.RoleList{
 			Items: []rbacv1.Role{},
@@ -890,6 +907,9 @@ func (h handler) getAPIsClusterResources(w http.ResponseWriter, r *http.Request)
 			r.Items = append(r.Items, o.Items...)
 		case *networkingv1.IngressList:
 			r := result.(*networkingv1.IngressList)
+			r.Items = append(r.Items, o.Items...)
+		case *networkingv1.NetworkPolicyList:
+			r := result.(*networkingv1.NetworkPolicyList)
 			r.Items = append(r.Items, o.Items...)
 		case *rbacv1.RoleList:
 			r := result.(*rbacv1.RoleList)
