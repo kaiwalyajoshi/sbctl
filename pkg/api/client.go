@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 
 	"github.com/pkg/errors"
@@ -52,7 +51,9 @@ users:
 `
 
 	configString := fmt.Sprintf(ctxTemplate, endPoint)
-	kubeconfigFile, err := ioutil.TempFile("", "local-kubeconfig-")
+	// DELETEME@kjoshi, restore this!
+	//kubeconfigFile, err := ioutil.TempFile("", "local-kubeconfig-")
+	kubeconfigFile, err := os.Create("/tmp/local-kubeconfig")
 	if err != nil {
 		return "", errors.Wrap(err, "failed to create config file")
 	}
