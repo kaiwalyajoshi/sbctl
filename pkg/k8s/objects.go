@@ -59,3 +59,14 @@ func GetEmptyPersistentVolumeClaimList() *corev1.PersistentVolumeClaimList {
 	})
 	return r
 }
+
+func GetEmptyReplicationControllerList() *corev1.ReplicationControllerList {
+	r := &corev1.ReplicationControllerList{
+		Items: []corev1.ReplicationController{},
+	}
+	r.GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
+		Version: "v1",
+		Kind:    "ReplicationControllerList",
+	})
+	return r
+}

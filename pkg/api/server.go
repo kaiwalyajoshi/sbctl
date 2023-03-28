@@ -261,6 +261,16 @@ func (h handler) getAPIV1ClusterResources(w http.ResponseWriter, r *http.Request
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+	case "replicationcontrollers":
+		result = k8s.GetEmptyReplicationControllerList()
+		// TODO@kjoshi: Add this properly
+		//dirName := filepath.Join(h.clusterData.ClusterResourcesDir, fmt.Sprintf("%s", sbctlutil.GetSBCompatibleResourceName(resource)))
+		//filenames, err = getJSONFileListFromDir(dirName)
+		//if err != nil {
+		//	log.Println("failed to get replicationcontroller files from dir", err)
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
 	}
 
 	for _, fileName := range filenames {
@@ -309,6 +319,9 @@ func (h handler) getAPIV1ClusterResources(w http.ResponseWriter, r *http.Request
 			r.Items = append(r.Items, o.Items...)
 		case *corev1.PersistentVolumeClaimList:
 			r := result.(*corev1.PersistentVolumeClaimList)
+			r.Items = append(r.Items, o.Items...)
+		case *corev1.ReplicationControllerList:
+			r := result.(*corev1.ReplicationControllerList)
 			r.Items = append(r.Items, o.Items...)
 		default:
 			log.Println("wrong gvk is found", gvk)
@@ -677,6 +690,23 @@ func (h handler) getAPIsClusterResources(w http.ResponseWriter, r *http.Request)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+	case "daemonsets":
+		result = &appsv1.DaemonSetList{
+			Items: []appsv1.DaemonSet{},
+		}
+		result.GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
+			Group:   group,
+			Version: version,
+			Kind:    "DaemonSetList",
+		})
+		//TODO@kjoshi: Implement this properly
+		//dirName := filepath.Join(h.clusterData.ClusterResourcesDir, fmt.Sprintf("%s", resource))
+		//filenames, err = getJSONFileListFromDir(dirName)
+		//if err != nil {
+		//	log.Println("failed to get daemonset files from dir", err)
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
 	case "statefulsets":
 		result = &appsv1.StatefulSetList{
 			Items: []appsv1.StatefulSet{},
@@ -841,6 +871,9 @@ func (h handler) getAPIsClusterResources(w http.ResponseWriter, r *http.Request)
 			r.Items = append(r.Items, o.Items...)
 		case *appsv1.StatefulSetList:
 			r := result.(*appsv1.StatefulSetList)
+			r.Items = append(r.Items, o.Items...)
+		case *appsv1.DaemonSetList:
+			r := result.(*appsv1.DaemonSetList)
 			r.Items = append(r.Items, o.Items...)
 		case *storagev1.StorageClassList:
 			r := result.(*storagev1.StorageClassList)
@@ -1155,6 +1188,14 @@ func filterObjectsByLabels(object runtime.Object, selector fields.Selector) (run
 		return r, nil
 	case *corev1.PersistentVolumeClaimList:
 		r := k8s.GetEmptyPersistentVolumeClaimList()
+		for _, i := range o.Items {
+			if selector.Matches(labels.Set(i.GetObjectMeta().GetLabels())) {
+				r.Items = append(r.Items, i)
+			}
+		}
+		return r, nil
+	case *corev1.ReplicationControllerList:
+		r := k8s.GetEmptyReplicationControllerList()
 		for _, i := range o.Items {
 			if selector.Matches(labels.Set(i.GetObjectMeta().GetLabels())) {
 				r.Items = append(r.Items, i)

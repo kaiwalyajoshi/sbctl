@@ -93,6 +93,13 @@ func Decode(resource string, data []byte) (runtime.Object, *schema.GroupVersionK
 				Version: "v1",
 			})
 		}
+	case *corev1.ReplicationControllerList:
+		for i := range o.Items {
+			o.Items[i].GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
+				Kind:    "ReplicationController",
+				Version: "v1",
+			})
+		}
 	case *batchv1.JobList:
 		for i := range o.Items {
 			o.Items[i].GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
@@ -130,6 +137,14 @@ func Decode(resource string, data []byte) (runtime.Object, *schema.GroupVersionK
 			o.Items[i].GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
 				Group:   "apps",
 				Kind:    "StatefulSet",
+				Version: "v1",
+			})
+		}
+	case *appsv1.DaemonSetList:
+		for i := range o.Items {
+			o.Items[i].GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
+				Group:   "apps",
+				Kind:    "DaemonSet",
 				Version: "v1",
 			})
 		}
