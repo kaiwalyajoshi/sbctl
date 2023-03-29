@@ -25,6 +25,7 @@ import (
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
+	policyv1 "k8s.io/api/policy/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	extensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -869,6 +870,22 @@ func (h handler) getAPIsClusterResources(w http.ResponseWriter, r *http.Request)
 		//	w.WriteHeader(http.StatusInternalServerError)
 		//	return
 		//}
+	case "poddisruptionbudgets":
+		result = &policyv1.PodDisruptionBudgetList{
+			Items: []policyv1.PodDisruptionBudget{},
+		}
+		result.GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{
+			Group:   group,
+			Version: version,
+			Kind:    "PodDisruptionBudgetList",
+		})
+		//TODO@kjoshi: Add this to the exporters.
+		//filenames = []string{filepath.Join(h.clusterData.ClusterResourcesDir, fmt.Sprintf("%s.json", sbctlutil.GetSBCompatibleResourceName(resource)))}
+		//if err != nil {
+		//	log.Println("failed to get pod-disruption-budgets files from dir", err)
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
 	}
 
 	for _, fileName := range filenames {
@@ -927,6 +944,9 @@ func (h handler) getAPIsClusterResources(w http.ResponseWriter, r *http.Request)
 			r.Items = append(r.Items, o.Items...)
 		case *rbacv1.RoleBindingList:
 			r := result.(*rbacv1.RoleBindingList)
+			r.Items = append(r.Items, o.Items...)
+		case *policyv1.PodDisruptionBudgetList:
+			r := result.(*policyv1.PodDisruptionBudgetList)
 			r.Items = append(r.Items, o.Items...)
 		default:
 			log.Println("wrong gvk is found", gvk)
